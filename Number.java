@@ -165,6 +165,10 @@ public class Number{
     }
 
     public String toString(Number num){
-        return null;
+        String s = "";
+        for(int i = 0; i < num.len(); i++){
+            
+        }
+        return s;
     }
 }
