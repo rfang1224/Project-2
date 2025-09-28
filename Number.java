@@ -164,11 +164,15 @@ public class Number{
         return product;
     }
 
-    public String toString(Number num){
+    public String toString(){
+        Number num = this;
         String s = "";
+        Node n = num.head;
         for(int i = 0; i < num.len(); i++){
-            
+            s+=n.getVal();
+            n = n.getNext();
         }
+        s = new StringBuilder(s).reverse().toString();
         return s;
     }
 }
