@@ -164,6 +164,52 @@ public class Number{
         return product;
     }
 
+    public int compareTo(Number other){
+        Number num1 = this;
+        Number num2 = other;
+        if(num1.len() > num2.len()){
+            return 1;
+        }
+        else if(num1.len() < num2.len()){
+            return -1;
+        }
+        Number rev1 = new Number(new StringBuilder(num1.toString()).reverse().toString());
+        Number rev2 = new Number(new StringBuilder(num2.toString()).reverse().toString());
+        Node temp1 = rev1.head;
+        Node temp2 = rev2.head;
+        for(int i = 0; i < rev1.len(); i++){
+            if(temp1.getVal() > temp2.getVal()){
+                return 1;
+            }
+            if(temp1.getVal() < temp2.getVal()){
+                return -1;
+            }
+            temp1 = temp1.getNext();
+            temp2 = temp2.getNext();
+        }
+        return 0;
+    }
+
+    public boolean equals(Object obj){
+        Number num1 = this;
+        Number num2 = (Number) obj;
+        if(num1.len() != num2.len()){
+            return false;
+        }
+        else{
+            Node head1 = num1.head;
+            Node head2 = num2.head;
+            for(int i = 0; i < num1.len(); i++){
+                if(head1.getVal() != head2.getVal()){
+                    return false;
+                }
+                head1 = head1.getNext();
+                head2 = head2.getNext();
+            }
+        }
+        return true;
+    }
+
     @Override
     public String toString(){
         Number num = this;
