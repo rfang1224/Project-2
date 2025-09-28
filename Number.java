@@ -164,6 +164,7 @@ public class Number{
         return product;
     }
 
+    @Override
     public String toString(){
         Number num = this;
         String s = "";
