@@ -51,7 +51,8 @@ public class Number{
         return count;
     }
 
-    public Number add(Number num1, Number num2){
+    public Number add(Number num2){
+        Number num1 = this;
         if(num1.len() > num2.len()){
             Node temp1 = num1.head;
             Node temp2 = num2.head;
@@ -119,5 +120,34 @@ public class Number{
             ntail = temp3;
         }
         return new Number(nhead, ntail);
+    }
+
+    public Number multiply(Number num2){
+        Number num1 = this;
+        Number product = new Number("0");
+        Node temp1 = num1.head;
+        Node temp2 = num2.head;
+        while(temp1 != null){
+            Node indHead = new Node((temp2.getVal() * temp1.getVal())%10, null);
+            Node indTail = indHead;
+            int carry = (indHead.getVal() * temp1.getVal())/10;
+            temp2 = temp2.getNext();
+            while(temp2 != null){
+                Node temp3 = new Node((temp1.getVal() * temp2.getVal() + carry)%10, indTail.getNext());
+                indTail.setNext(temp3);
+                indTail = temp3;
+                carry = (temp1.getVal() * temp2.getVal() + carry)/10;
+                temp2 = temp2.getNext();
+            }
+            Number indProd = new Number(indHead, indTail);
+            product = product.add(indProd);
+            temp2 = num2.head;
+            temp1 = temp1.getNext();
+        }
+        return product;
+    }
+
+    public String toString(Number num){
+        return null;
     }
 }
