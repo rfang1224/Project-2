@@ -127,10 +127,11 @@ public class Number{
         Number product = new Number("0");
         Node temp1 = num1.head;
         Node temp2 = num2.head;
+        int zeroes = 0;
         while(temp1 != null){
             Node indHead = new Node((temp2.getVal() * temp1.getVal())%10, null);
             Node indTail = indHead;
-            int carry = (indHead.getVal() * temp1.getVal())/10;
+            int carry = (temp2.getVal() * temp1.getVal())/10;
             temp2 = temp2.getNext();
             while(temp2 != null){
                 Node temp3 = new Node((temp1.getVal() * temp2.getVal() + carry)%10, indTail.getNext());
@@ -139,10 +140,26 @@ public class Number{
                 carry = (temp1.getVal() * temp2.getVal() + carry)/10;
                 temp2 = temp2.getNext();
             }
+            if(carry > 0){
+                Node temp3 = new Node(carry, null);
+                indTail.setNext(temp3);
+                indTail = temp3;
+            }
             Number indProd = new Number(indHead, indTail);
+            if(zeroes > 0){
+                Node headzero = new Node(0,indProd.head);
+                Node tailzero = headzero;
+                for(int i = 0; i < zeroes-1; i++){
+                    Node tempzero = new Node(0,tailzero.getNext());
+                    tailzero.setNext(tempzero);
+                    tailzero = tempzero;
+                }
+                indProd.head = headzero;
+            }
             product = product.add(indProd);
             temp2 = num2.head;
             temp1 = temp1.getNext();
+            zeroes++;
         }
         return product;
     }
