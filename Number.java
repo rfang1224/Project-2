@@ -41,6 +41,18 @@ public class Number implements Comparable<Number>{
                 throw new IllegalArgumentException("Input must contain only integer characters");
             }
         }
+        head = new Node(Character.getNumericValue(s.charAt(s.length()-1)), null);
+        tail = head;
+        for(int i = s.length()-2; i >=0; i--){
+            Node temp = new Node(Character.getNumericValue(s.charAt(i)), tail.getNext());
+            tail.setNext(temp);
+            tail = temp;
+        }
+         
+    }
+
+    private Number removeTrailingZeroes(){
+        String s = this.returnFullString();
         if(s.charAt(0) == '0' && s.length() > 1){
             int ind = 0;
             while(s.charAt(ind) == '0'){
@@ -51,14 +63,8 @@ public class Number implements Comparable<Number>{
             }
             s = s.substring(ind, s.length());
         }
-        head = new Node(Character.getNumericValue(s.charAt(s.length()-1)), null);
-        tail = head;
-        for(int i = s.length()-2; i >=0; i--){
-            Node temp = new Node(Character.getNumericValue(s.charAt(i)), tail.getNext());
-            tail.setNext(temp);
-            tail = temp;
-        }
-         
+        Number n = new Number(s);
+        return n;
     }
 
     private Number(Node h, Node t){
@@ -80,8 +86,8 @@ public class Number implements Comparable<Number>{
         if(other == null){
             throw new NullPointerException("Cannot add null number");
         }
-        Number num1 = this;
-        Number num2 = other;
+        Number num1 = this.removeTrailingZeroes();
+        Number num2 = other.removeTrailingZeroes();
         if(num1.length() > num2.length()){
             Node temp1 = num1.head;
             Node temp2 = num2.head;
@@ -152,7 +158,10 @@ public class Number implements Comparable<Number>{
     }
 
     public Number multiplyByDigit(int digit){
-        Number num1 = this;
+        if(digit < 0 || digit >9){
+            throw new IllegalArgumentException("Please enter an integer between 0 and 9 inclusive");
+        }
+        Number num1 = this.removeTrailingZeroes();
         Node temp = num1.head;
         Node nHead = new Node((temp.getVal() * digit)%10, null);
         Node nTail = nHead;
@@ -177,8 +186,8 @@ public class Number implements Comparable<Number>{
         if(other == null){
             throw new NullPointerException("Cannot multiply null number");
         }
-        Number num1 = this;
-        Number num2 = other;
+        Number num1 = this.removeTrailingZeroes();
+        Number num2 = other.removeTrailingZeroes();
         Number product = new Number("0");
         Node temp1 = num1.head;
         Node temp2 = num2.head;
@@ -220,8 +229,11 @@ public class Number implements Comparable<Number>{
     }
 
     public int compareTo(Number other){
-        Number num1 = this;
-        Number num2 = other;
+        if (other == null){
+            throw new NullPointerException("compared number cannot be null");
+        }
+        Number num1 = this.removeTrailingZeroes();
+        Number num2 = other.removeTrailingZeroes();
         if(num1.length() > num2.length()){
             return 1;
         }
@@ -265,8 +277,7 @@ public class Number implements Comparable<Number>{
         return true;
     }
 
-    @Override
-    public String toString(){
+    private String returnFullString(){
         Number num = this;
         String s = "";
         Node n = num.head;
@@ -276,5 +287,11 @@ public class Number implements Comparable<Number>{
         }
         s = new StringBuilder(s).reverse().toString();
         return s;
+    }
+
+    @Override
+    public String toString(){
+        Number n = this.removeTrailingZeroes();
+        return n.returnFullString();
     }
 }
