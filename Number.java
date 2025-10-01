@@ -1,3 +1,5 @@
+package project2;
+
 public class Number implements Comparable<Number>{
 
     private Node head;
