@@ -1,7 +1,12 @@
-public class Number{
+public class Number implements Comparable<Number>{
 
     private Node head;
     private Node tail;
+
+    /**
+     * Private inner class node
+     * Nodes representing the place values of each number value
+     */
 
     private class Node{
         private int value;
@@ -26,7 +31,26 @@ public class Number{
 
     }
 
-    public Number(String s){
+    public Number(String number){
+        String s = number;
+        if (s.equals(null)){
+            throw new NullPointerException("Number cannot be null");
+        }
+        for(int i = 0; i < s.length(); i++){
+            if(!Character.isDigit(s.charAt(i))){
+                throw new IllegalArgumentException("Input must contain only integer characters");
+            }
+        }
+        if(s.charAt(0) == '0' && s.length() > 1){
+            int ind = 0;
+            while(s.charAt(ind) == '0'){
+                if(ind == s.length()-1){
+                    break;
+                }
+                ind++;
+            }
+            s = s.substring(ind, s.length());
+        }
         head = new Node(Character.getNumericValue(s.charAt(s.length()-1)), null);
         tail = head;
         for(int i = s.length()-2; i >=0; i--){
@@ -34,14 +58,15 @@ public class Number{
             tail.setNext(temp);
             tail = temp;
         }
+         
     }
 
-    public Number(Node h, Node t){
+    private Number(Node h, Node t){
         head = h;
         tail = t;
     }
 
-    public int len(){
+    public int length(){
         int count = 0;
         Node start = this.head;
         while(start != null){
@@ -51,9 +76,13 @@ public class Number{
         return count;
     }
 
-    public Number add(Number num2){
+    public Number add(Number other){
+        if(other == null){
+            throw new NullPointerException("Cannot add null number");
+        }
         Number num1 = this;
-        if(num1.len() > num2.len()){
+        Number num2 = other;
+        if(num1.length() > num2.length()){
             Node temp1 = num1.head;
             Node temp2 = num2.head;
             Node nhead = new Node((temp1.getVal() + temp2.getVal())%10, null);
@@ -122,8 +151,34 @@ public class Number{
         return new Number(nhead, ntail);
     }
 
-    public Number multiply(Number num2){
+    public Number multiplyByDigit(int digit){
         Number num1 = this;
+        Node temp = num1.head;
+        Node nHead = new Node((temp.getVal() * digit)%10, null);
+        Node nTail = nHead;
+        int carry = (temp.getVal() * digit)/10;
+        temp = temp.getNext();
+        while(temp != null){
+            Node nTemp = new Node((digit*temp.getVal() + carry)%10, nTail.getNext());
+            nTail.setNext(nTemp);
+            nTail = nTemp;
+            carry = (digit*temp.getVal() + carry)/10;
+            temp = temp.getNext();
+        }
+        if(carry > 0){
+            Node fNode = new Node(carry, null);
+            nTail.setNext(fNode);
+            nTail = fNode;
+        }
+        return new Number(nHead, nTail);
+    }
+
+    public Number multiply(Number other){
+        if(other == null){
+            throw new NullPointerException("Cannot multiply null number");
+        }
+        Number num1 = this;
+        Number num2 = other;
         Number product = new Number("0");
         Node temp1 = num1.head;
         Node temp2 = num2.head;
@@ -167,17 +222,17 @@ public class Number{
     public int compareTo(Number other){
         Number num1 = this;
         Number num2 = other;
-        if(num1.len() > num2.len()){
+        if(num1.length() > num2.length()){
             return 1;
         }
-        else if(num1.len() < num2.len()){
+        else if(num1.length() < num2.length()){
             return -1;
         }
         Number rev1 = new Number(new StringBuilder(num1.toString()).reverse().toString());
         Number rev2 = new Number(new StringBuilder(num2.toString()).reverse().toString());
         Node temp1 = rev1.head;
         Node temp2 = rev2.head;
-        for(int i = 0; i < rev1.len(); i++){
+        for(int i = 0; i < rev1.length(); i++){
             if(temp1.getVal() > temp2.getVal()){
                 return 1;
             }
@@ -193,13 +248,13 @@ public class Number{
     public boolean equals(Object obj){
         Number num1 = this;
         Number num2 = (Number) obj;
-        if(num1.len() != num2.len()){
+        if(num1.length() != num2.length()){
             return false;
         }
         else{
             Node head1 = num1.head;
             Node head2 = num2.head;
-            for(int i = 0; i < num1.len(); i++){
+            for(int i = 0; i < num1.length(); i++){
                 if(head1.getVal() != head2.getVal()){
                     return false;
                 }
@@ -215,7 +270,7 @@ public class Number{
         Number num = this;
         String s = "";
         Node n = num.head;
-        for(int i = 0; i < num.len(); i++){
+        for(int i = 0; i < num.length(); i++){
             s+=n.getVal();
             n = n.getNext();
         }
