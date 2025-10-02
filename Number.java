@@ -1,5 +1,3 @@
-package project2;
-
 public class Number implements Comparable<Number>{
 
     private Node head;
@@ -34,19 +32,22 @@ public class Number implements Comparable<Number>{
     }
 
     public Number(String number){
-        String s = number;
-        if (s.equals(null)){
+
+        if (number.equals(null)){
             throw new NullPointerException("Number cannot be null");
         }
-        for(int i = 0; i < s.length(); i++){
-            if(!Character.isDigit(s.charAt(i))){
+
+        for(int i = 0; i < number.length(); i++){
+            if(!Character.isDigit(number.charAt(i))){
                 throw new IllegalArgumentException("Input must contain only integer characters");
             }
         }
-        head = new Node(Character.getNumericValue(s.charAt(s.length()-1)), null);
+
+        head = new Node(Character.getNumericValue(number.charAt(number.length()-1)), null);
         tail = head;
-        for(int i = s.length()-2; i >=0; i--){
-            Node temp = new Node(Character.getNumericValue(s.charAt(i)), tail.getNext());
+
+        for(int i = number.length()-2; i >=0; i--){
+            Node temp = new Node(Character.getNumericValue(number.charAt(i)), tail.getNext());
             tail.setNext(temp);
             tail = temp;
         }
@@ -54,19 +55,21 @@ public class Number implements Comparable<Number>{
     }
 
     private Number removeTrailingZeroes(){
-        String s = this.returnFullString();
-        if(s.charAt(0) == '0' && s.length() > 1){
-            int ind = 0;
-            while(s.charAt(ind) == '0'){
-                if(ind == s.length()-1){
+
+        String noTrailing = this.returnFullString();
+
+        if(noTrailing.charAt(0) == '0' && noTrailing.length() > 1){
+            int firstNonZero = 0;
+            while(noTrailing.charAt(firstNonZero) == '0'){
+                if(firstNonZero == noTrailing.length()-1){
                     break;
                 }
-                ind++;
+                firstNonZero++;
             }
-            s = s.substring(ind, s.length());
+            noTrailing = noTrailing.substring(firstNonZero, noTrailing.length());
         }
-        Number n = new Number(s);
-        return n;
+
+        return new Number(noTrailing);
     }
 
     private Number(Node h, Node t){
@@ -75,200 +78,183 @@ public class Number implements Comparable<Number>{
     }
 
     public int length(){
-        int count = 0;
-        Node start = this.head;
-        while(start != null){
-            count++;
-            start = start.getNext();
+        int countNodes = 0;
+        Node trackNodes = this.head;
+
+        while(trackNodes != null){
+            countNodes++;
+            trackNodes = trackNodes.getNext();
         }
-        return count;
+        return countNodes;
     }
 
     public Number add(Number other){
+
         if(other == null){
             throw new NullPointerException("Cannot add null number");
         }
-        Number num1 = this.removeTrailingZeroes();
-        Number num2 = other.removeTrailingZeroes();
-        if(num1.length() > num2.length()){
-            Node temp1 = num1.head;
-            Node temp2 = num2.head;
-            Node nhead = new Node((temp1.getVal() + temp2.getVal())%10, null);
-            Node ntail = nhead;
-            int carry = (temp1.getVal() + temp2.getVal())/10;
-            temp1 = temp1.getNext();
-            temp2 = temp2.getNext();
-            while(temp1 != null){
-                if(temp2 != null){
-                    int sum = (temp1.getVal() + temp2.getVal()) + carry;
-                    Node temp3 = new Node(sum%10, ntail.getNext());
-                    ntail.setNext(temp3);
-                    ntail = temp3;
-                    carry = sum/10;
-                    temp1 = temp1.getNext();
-                    temp2 = temp2.getNext();
-                }
-                else{
-                    int sum = (temp1.getVal()) + carry;
-                    Node temp3 = new Node(sum%10, ntail.getNext());
-                    ntail.setNext(temp3);
-                    ntail = temp3;
-                    carry = sum/10;
-                    temp1 = temp1.getNext();
-                }
-            }
-            if(carry > 0){
-                Node temp3 = new Node(carry, null);
-                ntail.setNext(temp3);
-                ntail = temp3;
-            }
-            return new Number(nhead, ntail);
+
+        Number longer = this.removeTrailingZeroes();
+        Number shorter = other.removeTrailingZeroes();
+
+        if(this.removeTrailingZeroes().length() < other.removeTrailingZeroes().length()){
+            longer = other.removeTrailingZeroes();
+            shorter = this.removeTrailingZeroes();
         }
 
-        Node temp1 = num1.head;
-        Node temp2 = num2.head;
-        Node nhead = new Node((temp1.getVal() + temp2.getVal())%10, null);
-        Node ntail = nhead;
-        int carry = (temp1.getVal() + temp2.getVal())/10;
-        temp1 = temp1.getNext();
-        temp2 = temp2.getNext();
-        while(temp2 != null){
-            if(temp1 != null){
-                int sum = (temp1.getVal() + temp2.getVal()) + carry;
-                Node temp3 = new Node(sum%10, ntail.getNext());
-                ntail.setNext(temp3);
-                ntail = temp3;
+        Node trackerOfLonger = longer.head;
+        Node trackerOfShorter = shorter.head;
+        Node headOfSum = new Node((trackerOfLonger.getVal() + trackerOfShorter.getVal())%10, null);
+        Node tailOfSum = headOfSum;
+        int carry = (trackerOfLonger.getVal() + trackerOfShorter.getVal())/10;
+        trackerOfLonger = trackerOfLonger.getNext();
+        trackerOfShorter = trackerOfShorter.getNext();
+
+        while(trackerOfLonger != null){
+            
+            if(trackerOfShorter != null){
+                int sum = (trackerOfLonger.getVal() + trackerOfShorter.getVal()) + carry;
+                Node tempOfSum = new Node(sum%10, tailOfSum.getNext());
+                tailOfSum.setNext(tempOfSum);
+                tailOfSum = tempOfSum;
                 carry = sum/10;
-                temp1 = temp1.getNext();
-                temp2 = temp2.getNext();
+                trackerOfLonger = trackerOfLonger.getNext();
+                trackerOfShorter = trackerOfShorter.getNext();
             }
+
             else{
-                int sum = (temp2.getVal()) + carry;
-                Node temp3 = new Node(sum%10, ntail.getNext());
-                ntail.setNext(temp3);
-                ntail = temp3;
+                int sum = (trackerOfLonger.getVal()) + carry;
+                Node temp3 = new Node(sum%10, tailOfSum.getNext());
+                tailOfSum.setNext(temp3);
+                tailOfSum = temp3;
                 carry = sum/10;
-                temp2 = temp2.getNext();
+                trackerOfLonger = trackerOfLonger.getNext();
             }
+
         }
+        
         if(carry > 0){
-            Node temp3 = new Node(carry, null);
-            ntail.setNext(temp3);
-            ntail = temp3;
+            Node tempOfSum = new Node(carry, null);
+            tailOfSum.setNext(tempOfSum);
+            tailOfSum = tempOfSum;
         }
-        return new Number(nhead, ntail);
+
+        return new Number(headOfSum, tailOfSum);
     }
 
     public Number multiplyByDigit(int digit){
+
         if(digit < 0 || digit >9){
             throw new IllegalArgumentException("Please enter an integer between 0 and 9 inclusive");
         }
-        Number num1 = this.removeTrailingZeroes();
-        Node temp = num1.head;
-        Node nHead = new Node((temp.getVal() * digit)%10, null);
-        Node nTail = nHead;
-        int carry = (temp.getVal() * digit)/10;
-        temp = temp.getNext();
-        while(temp != null){
-            Node nTemp = new Node((digit*temp.getVal() + carry)%10, nTail.getNext());
-            nTail.setNext(nTemp);
-            nTail = nTemp;
-            carry = (digit*temp.getVal() + carry)/10;
-            temp = temp.getNext();
+
+        Number withoutZero = this.removeTrailingZeroes();
+        Node trackerOfOriginal = withoutZero.head;
+        Node headOfProduct = new Node((trackerOfOriginal.getVal() * digit)%10, null);
+        Node tailOfProduct = headOfProduct;
+        int carry = (trackerOfOriginal.getVal() * digit)/10;
+        trackerOfOriginal = trackerOfOriginal.getNext();
+
+        while(trackerOfOriginal != null){
+            Node tempOfProduct = new Node((digit*trackerOfOriginal.getVal() + carry)%10, tailOfProduct.getNext());
+            tailOfProduct.setNext(tempOfProduct);
+            tailOfProduct = tempOfProduct;
+            carry = (digit*trackerOfOriginal.getVal() + carry)/10;
+            trackerOfOriginal = trackerOfOriginal.getNext();
         }
+
         if(carry > 0){
             Node fNode = new Node(carry, null);
-            nTail.setNext(fNode);
-            nTail = fNode;
+            tailOfProduct.setNext(fNode);
+            tailOfProduct = fNode;
         }
-        return new Number(nHead, nTail);
+
+        return new Number(headOfProduct, tailOfProduct);
     }
 
     public Number multiply(Number other){
+
         if(other == null){
             throw new NullPointerException("Cannot multiply null number");
         }
-        Number num1 = this.removeTrailingZeroes();
-        Number num2 = other.removeTrailingZeroes();
+
+        Number factor1 = this.removeTrailingZeroes();
+        Number factor2 = other.removeTrailingZeroes();
         Number product = new Number("0");
-        Node temp1 = num1.head;
-        Node temp2 = num2.head;
+        Node trackerOfFactor1 = factor1.head;
         int zeroes = 0;
-        while(temp1 != null){
-            Node indHead = new Node((temp2.getVal() * temp1.getVal())%10, null);
-            Node indTail = indHead;
-            int carry = (temp2.getVal() * temp1.getVal())/10;
-            temp2 = temp2.getNext();
-            while(temp2 != null){
-                Node temp3 = new Node((temp1.getVal() * temp2.getVal() + carry)%10, indTail.getNext());
-                indTail.setNext(temp3);
-                indTail = temp3;
-                carry = (temp1.getVal() * temp2.getVal() + carry)/10;
-                temp2 = temp2.getNext();
-            }
-            if(carry > 0){
-                Node temp3 = new Node(carry, null);
-                indTail.setNext(temp3);
-                indTail = temp3;
-            }
-            Number indProd = new Number(indHead, indTail);
+
+        while(trackerOfFactor1 != null){
+            
+            Number independentProduct = factor2.multiplyByDigit(trackerOfFactor1.getVal());
+
             if(zeroes > 0){
-                Node headzero = new Node(0,indProd.head);
+                Node headzero = new Node(0,independentProduct.head);
                 Node tailzero = headzero;
                 for(int i = 0; i < zeroes-1; i++){
                     Node tempzero = new Node(0,tailzero.getNext());
                     tailzero.setNext(tempzero);
                     tailzero = tempzero;
                 }
-                indProd.head = headzero;
+                independentProduct.head = headzero;
             }
-            product = product.add(indProd);
-            temp2 = num2.head;
-            temp1 = temp1.getNext();
+
+            product = product.add(independentProduct);
+            trackerOfFactor1 = trackerOfFactor1.getNext();
             zeroes++;
+
         }
+
         return product;
+
     }
 
     public int compareTo(Number other){
         if (other == null){
             throw new NullPointerException("compared number cannot be null");
         }
-        Number num1 = this.removeTrailingZeroes();
-        Number num2 = other.removeTrailingZeroes();
-        if(num1.length() > num2.length()){
+        Number withoutZero1 = this.removeTrailingZeroes();
+        Number withoutZero2 = other.removeTrailingZeroes();
+        if(withoutZero1.length() > withoutZero2.length()){
             return 1;
         }
-        else if(num1.length() < num2.length()){
+        else if(withoutZero1.length() < withoutZero2.length()){
             return -1;
         }
-        Number rev1 = new Number(new StringBuilder(num1.toString()).reverse().toString());
-        Number rev2 = new Number(new StringBuilder(num2.toString()).reverse().toString());
-        Node temp1 = rev1.head;
-        Node temp2 = rev2.head;
-        for(int i = 0; i < rev1.length(); i++){
-            if(temp1.getVal() > temp2.getVal()){
+        Number reverse1 = new Number(new StringBuilder(withoutZero1.toString()).reverse().toString());
+        Number reverse2 = new Number(new StringBuilder(withoutZero2.toString()).reverse().toString());
+
+        Node tracker1 = reverse1.head;
+        Node tracker2 = reverse2.head;
+
+        for(int i = 0; i < reverse1.length(); i++){
+            if(tracker1.getVal() > tracker2.getVal()){
                 return 1;
             }
-            if(temp1.getVal() < temp2.getVal()){
+            if(tracker1.getVal() < tracker2.getVal()){
                 return -1;
             }
-            temp1 = temp1.getNext();
-            temp2 = temp2.getNext();
+            tracker1 = tracker1.getNext();
+            tracker2 = tracker2.getNext();
         }
         return 0;
     }
 
     public boolean equals(Object obj){
-        Number num1 = this;
-        Number num2 = (Number) obj;
-        if(num1.length() != num2.length()){
+
+        Number compared1 = this.removeTrailingZeroes();
+        Number compared2 = ((Number) obj).removeTrailingZeroes();
+
+        if(compared1.length() != compared2.length()){
             return false;
         }
+
         else{
-            Node head1 = num1.head;
-            Node head2 = num2.head;
-            for(int i = 0; i < num1.length(); i++){
+
+            Node head1 = compared1.head;
+            Node head2 = compared2.head;
+
+            for(int i = 0; i < compared1.length(); i++){
                 if(head1.getVal() != head2.getVal()){
                     return false;
                 }
@@ -276,24 +262,29 @@ public class Number implements Comparable<Number>{
                 head2 = head2.getNext();
             }
         }
+
         return true;
+
     }
 
     private String returnFullString(){
+
         Number num = this;
-        String s = "";
-        Node n = num.head;
+        String stringRepresentation = "";
+        Node tracker = num.head;
+
         for(int i = 0; i < num.length(); i++){
-            s+=n.getVal();
-            n = n.getNext();
+            stringRepresentation+=tracker.getVal();
+            tracker = tracker.getNext();
         }
-        s = new StringBuilder(s).reverse().toString();
-        return s;
+
+        stringRepresentation = new StringBuilder(stringRepresentation).reverse().toString();
+        return stringRepresentation;
     }
 
     @Override
     public String toString(){
-        Number n = this.removeTrailingZeroes();
-        return n.returnFullString();
+        Number representationWithoutZero = this.removeTrailingZeroes();
+        return representationWithoutZero.returnFullString();
     }
 }
